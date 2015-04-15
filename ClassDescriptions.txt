@@ -1,0 +1,32 @@
+Class Breakdown of Major Components
+-------------------------------------------------
+	* PlayFabLoginCalls.cs -- Contains static functions for all the PlayFab API and helper calls. If you are looking for PlayFab calls, they should all be in this class. 
+	* AuthenticationController.cs -- The primary controller for this sample. Provides the initial logic that determines which screens and logins to show
+	* DebugInfoController.cs -- Provides a top toolbar after a player logs in. Compare with the obligatory menu bar for info and options 
+		* Panel_AccountInfo.cs -- Draws and controls the views for displaying and updating account information. 
+
+Game Logic & UI View Classes
+-------------------------------------------------
+	* AutoLoginController.cs -- Attempts to log in automatically based on previous login information or device id. 
+	* ManuaLoginController.cs -- Provides a menu system for letting the players select their prefered login pathway (3rd party logins only work after they have been linked to an existing PlayFab account)
+		* LoginPathwayController.cs -- Draws and controls the menu for selecting a login pathway
+			* Fields_PlayFab.cs -- Draws and controls the PlayFab credentials fields
+			* Fields_Facebook.cs -- Draws and controls the Facebook credentials fields
+			* Fields_GameCenter.cs -- Draws and controls the GameCenter credentials fields
+			* Fields_GooglePlus.cs -- Draws and controls the Google+ credentials fields
+	* RegisterController.cs -- 	Draws and controls the PlayFab registration fields
+	* BottomMenuController.cs -- Draws and controls the buttons towards the bottom of the screen 
+	* TEST_PlayerPrefs.cs -- A testing script used to pre-configure the playerprefs on Awake()
+
+
+Plugins & Native Code
+-------------------------------------------------
+* HamzaScripts: Hamza Lazâar (Twitter @RealJohnTube) has generously shared sample code for showing how to create a GooglePlay plugin that returns a google+ authentication token.
+	* GooglePlusForUnity.jar --  This plugin provides the needed information for using LoginWithGoogleAccount on Android devices. 
+	* Plugin source included
+* Google-Play-Services: 
+	* Official Unity Plugin from Google -- v0.9.15 -- https://github.com/playgameservices/play-games-plugin-for-unity
+	* Plugin source included
+* Facebook:
+	* Official Unity Plugin from Facebook -- v6.2.1 -- https://developers.facebook.com/docs/unity/downloads
+	* Plugin source included
