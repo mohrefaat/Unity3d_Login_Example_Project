@@ -1,4 +1,4 @@
-PlayFab Login Example Readme (v1.9)
+PlayFab Login Example README (v1.9)
 ========
 1. Overview:
 ----
@@ -62,7 +62,7 @@ His contributions include:
 + Assets/PlayFabSamples/Login/Scripts/HamzaScripts
 + Plugins/Android/GooglePlusForUnity 
 
-7. Copyright and Licensing Information:
+6. Copyright and Licensing Information:
 ----
   Apache License -- 
   Version 2.0, January 2004
@@ -70,13 +70,11 @@ His contributions include:
 
   Full details available within the LICENSE file.
 
-8. Version History:
+7. Version History:
 ----
 * 4/13/15 -- Initial Public Release (v1.52)
 
 #### Coming in Future Versions
--*- Coming soon -*-
 * Steam Authentication Example
 * Account Pathway linking and unlinking
 * Integrated PlayFab Plugin examples
--*-
