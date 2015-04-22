@@ -74,8 +74,7 @@ His contributions include:
 ----
 * 4/13/15 -- Initial Public Release (v1.52)
 
-## Coming in Future Versions
-----
+#### Coming in Future Versions
 -*- Coming soon -*-
 * Steam Authentication Example
 * Account Pathway linking and unlinking
