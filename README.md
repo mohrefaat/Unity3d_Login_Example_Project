@@ -15,7 +15,7 @@ This repo contains the raw Unity3d (v4.6.3) project.
     * Partial (A.K.A. guest accounts) - These accounts do not have complete player information (username, password, email). These accounts are created when the CreateAccount parameter is true when calling any of our LogInWith____() APIs ([Facebook Example](https://api.playfab.com/Documentation/Client/method/LoginWithFacebook)).
     * Complete -  These are accounts have a username, password and email. 
   * Multiple authentication pathways can be linked to a PlayFab account. This is a powerful feature allowing a player to easily play and retain their player information across platforms. 
-    * Example: When linked, a player can login using Facebook, Google+, email, or GameCenter and be assured that his or her player data persists across the various pathways. 
+    * Example: When linked, a player can log in using Facebook, Google+, email, or GameCenter and be assured that his or her player data persists across the various pathways. 
     * Documentation on linking accounts can be found [here](https://api.playfab.com/Documentation/Client/method/LinkFacebookAccount).
 
 3. Source Code & Key Repository Components:
@@ -52,11 +52,11 @@ Do you have ideas on how we can make our products and services better?
 
 Our Developer Success Team can assist with answering any questions as well as process any feedback you have about PlayFab services.
 
-[Forums, Support and Knowlage Base](https://support.playfab.com/support/home)
+[Forums, Support and Knowledge Base](https://support.playfab.com/support/home)
 
 #### Special Thanks to Hamza Lazâar 
 #####(Check out his Twitter @RealJohnTube) 
-Hamza Lazâar has generously shared sample code for showing how to create a GooglePlay plugin that returns a google+ authentication token. This plugin provides the needed information for using LoginWithGoogleAccount on Android devices. 
+Hamza Lazâar has generously shared sample code for showing how to create a Google Play plugin that returns a google+ authentication token. This plugin provides the needed information for using LoginWithGoogleAccount on Android devices. 
 
 His contributions include:
 + Assets/PlayFabSamples/Login/Scripts/HamzaScripts
