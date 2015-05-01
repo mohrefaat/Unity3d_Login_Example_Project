@@ -2,9 +2,6 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using PlayFab;
-using PlayFab.ClientModels;
-
 
 [RequireComponent(typeof(GooglePlusWrapper))]
 public class GooglePlusDemo : MonoBehaviour {
@@ -18,6 +15,9 @@ public class GooglePlusDemo : MonoBehaviour {
     [SerializeField]
     private Button signOutButton;
 
+    [SerializeField]
+    private Button revokeButton;
+
     private string token;
 
     public string Token {
@@ -29,7 +29,7 @@ public class GooglePlusDemo : MonoBehaviour {
                 return;
             }
             token = value;
-            //tokenText.SetText("TOKEN : {0}", token);
+            tokenText.SetText("TOKEN : {0}", token);
         }
     }
 
@@ -47,25 +47,26 @@ public class GooglePlusDemo : MonoBehaviour {
 
     private ContactInfo[] googlePlusContacts;
 
-    private const string DefaultObjectName = "GooglePlusGO";
-
 #if !UNITY_EDITOR && UNITY_ANDROID
 
     private GooglePlusWrapper wrapper;
 
     private void Awake() {
         wrapper = GetComponent<GooglePlusWrapper>();
-        this.gameObject.name = DefaultObjectName;
     }
 #endif
 
     private void Start() {
-//        getTokenButton.onClick.AddListener(OnGetTokenButtonClicked);
-//        getTokenButton.interactable = true;
-//        signInButton.onClick.AddListener(OnSignInButtonClicked);
-//        signInButton.interactable = true;
-//        signOutButton.onClick.AddListener(OnSignOutButtonClicked);
-//        signOutButton.interactable = false;
+        displayNameText.text = "NOT CONNECTED !";
+        tokenText.text = "NO TOKEN YET";
+        getTokenButton.onClick.AddListener(OnGetTokenButtonClicked);
+        getTokenButton.interactable = true;
+        signInButton.onClick.AddListener(OnSignInButtonClicked);
+        signInButton.interactable = true;
+        signOutButton.onClick.AddListener(OnSignOutButtonClicked);
+        signOutButton.interactable = false;
+        revokeButton.onClick.AddListener(OnRevokeButtonClicked);
+        revokeButton.interactable = false;
     }
 
     public void OnGetTokenButtonClicked() {
@@ -82,15 +83,22 @@ public class GooglePlusDemo : MonoBehaviour {
 
     public void OnSignOutButtonClicked() {
 #if !UNITY_EDITOR && UNITY_ANDROID
-    wrapper.SignOut();
+        wrapper.SignOut();
 #endif
         getTokenButton.interactable = true;
         signOutButton.interactable = false;
         signInButton.interactable = true;
+        revokeButton.interactable = false;
         displayNameText.text = "NOT CONNECTED !";
-        tokenText.text = "NOT TOKEN YET";
+        tokenText.text = "NO TOKEN YET";
         profilePictureImage.sprite = new Sprite();
         googleCirclesList.ClearList();
+    }
+
+    public void OnRevokeButtonClicked() {
+#if !UNITY_EDITOR && UNITY_ANDROID
+        wrapper.RevokeAccess();
+#endif
     }
 
     public void OnCirclesLoaded(string circles) {
@@ -102,37 +110,13 @@ public class GooglePlusDemo : MonoBehaviour {
         }
     }
 
-    public void OnGoogleTokenReceived(string token) {
+    public void OnTokenReceived(string token) {
         Token = token;
-		SignOnWithGoogle(token);
+        getTokenButton.interactable = false;
     }
 
-
-
-	public void SignOnWithGoogle(string token)
-	{
-		Debug.Log(string.Format ("Signing into PlayFab with: {0}", token));
-		LoginWithGoogleAccountRequest request = new LoginWithGoogleAccountRequest();
-		request.AccessToken = token;
-		request.CreateAccount = true;
-		PlayFabClientAPI.LoginWithGoogleAccount(request, OnSignOnWithGoogleSuccess, OnPlayFabError);
-		
-	}
-
-	public void OnPlayFabError(PlayFabError error)
-	{
-		Debug.Log(error.ErrorMessage);
-	}
-
-	public void OnSignOnWithGoogleSuccess(LoginResult result)
-	{
-		Debug.Log(result.SessionTicket);
-	}
-
-
-
-
     public void OnSignInSuccess(string googleId) {
+        Utils.Log("SignInSuccess for id={0}", googleId);
 #if !UNITY_EDITOR && UNITY_ANDROID
         displayNameText.SetText("Hello {0} !", wrapper.GetDisplayName());
         string profilePictureUrl = wrapper.GetProfilePictureUrl().Replace("50", "180");
@@ -140,14 +124,29 @@ public class GooglePlusDemo : MonoBehaviour {
         wrapper.LoadCircles();
         signOutButton.interactable = true;
         signInButton.interactable = false;
+        revokeButton.interactable = true;
 #endif
     }
 
     public void OnConnectionSuspended(string reason) {
+        Utils.Log("is it working ? {0}", reason);
+    }
+
+    public void OnAccessRevoked() {
+        getTokenButton.interactable = true;
+        signOutButton.interactable = false;
+        signInButton.interactable = true;
+        revokeButton.interactable = false;
+        displayNameText.text = "NOT CONNECTED !";
+        tokenText.text = "NO TOKEN YET";
+        profilePictureImage.sprite = new Sprite();
+        googleCirclesList.ClearList();
     }
 
     public void OnProfilePictureDownloaded(Texture2D texture) {
-        profilePictureImage.SetTexture2D(texture, 180, 180);
+        profilePictureImage.SetTexture2D(texture,
+            ContactInfo.PROFILE_PICTURE_DIMENSION,
+            ContactInfo.PROFILE_PICTURE_DIMENSION);
     }
 
     private ContactInfo ParseGooglePlusContact(string contact) {
@@ -157,7 +156,25 @@ public class GooglePlusDemo : MonoBehaviour {
             DisplayName = tmp[1],
         };
         if (tmp.Length == 3) {
-            info.ProfilePictureUrl = tmp[2].Replace("50", "180");
+            string url = tmp[2];
+            if (!url.Contains("null")) {
+                if (url.Contains("?sz=50")) {
+                    info.ProfilePictureUrl = url.Replace("50", ContactInfo.PROFILE_PICTURE_DIMENSION.ToString());
+                    //Utils.Log("50 {0}", name);
+                }
+                else if (url.Contains("?sz=128")) {
+                    info.ProfilePictureUrl = url.Replace("128", ContactInfo.PROFILE_PICTURE_DIMENSION.ToString());
+                    //Utils.Log("128 {0}", name);
+                }
+                else {
+                    info.ProfilePictureUrl = string.Concat(url,
+                        string.Format("?sz={0}", ContactInfo.PROFILE_PICTURE_DIMENSION));
+                    //Utils.Log("none {0}", name);
+                }
+            }
+            else {
+                //Utils.Log("url == {0}", url);
+            }
         }
         return info;
     }

@@ -42,10 +42,10 @@ public class ListView : MonoBehaviour, IInitializePotentialDragHandler, IBeginDr
         }
         set {
             if (horizontal) {
-                value.y = 0f;
+                value.y = initialContentPosition.y;
             }
             else {
-                value.x = 0f;
+                value.x = initialContentPosition.x;
             }
             contentRect.anchoredPosition = value;
         }
@@ -147,7 +147,8 @@ public class ListView : MonoBehaviour, IInitializePotentialDragHandler, IBeginDr
     }
 
     public void ClearList() {
-        itemsCollection.Clear();
+        ItemsCollection.Clear();
+        AnchoredPosition = initialContentPosition;
         if (horizontal) layoutGroup.padding.right = 0;
         else layoutGroup.padding.top = 0;
         poolManager.DespawnChildren(ItemPrefab, contentRect);

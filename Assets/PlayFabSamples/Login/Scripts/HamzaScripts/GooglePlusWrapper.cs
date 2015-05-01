@@ -1,52 +1,34 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-
 public class GooglePlusWrapper : MonoBehaviour {
-	private string token;
-	public string Token {
-		get {
-			return token;
-		}
-		private set {
-			if (token != null && token.Equals(value)) {
-				return;
-			}
-			token = value;
-		}
-	}
-	
-#if !UNITY_EDITOR && UNITY_ANDROID
-	private string className = "com.ThugLeaf.GooglePlusForUnity.DemoActivity";
+
+    //#if !UNITY_EDITOR && UNITY_ANDROID
+    private const string className = "com.ThugLeaf.GooglePlusForUnity.GooglePlusActivity";
+
+    public static int SIGN_IN_REASON = 1;
+    public static int GET_TOKEN_REASON = 2;
+    public static int SIGN_OUT_REASON = 3;
+    public static int LOAD_CIRCLES_REASON = 4;
+    public static int REVOKE_ACCESS_REASON = 5;
+    public static int INVALIDATE_TOKEN_REASON = 6;
+
     private static AndroidJavaClass activityClass;
-    private static AndroidJavaObject activityInstance;
 
     private void Init() {
-        Debug.Log("Init start");
         AndroidJNI.AttachCurrentThread();
-        activityClass = new AndroidJavaClass(className);
-        activityInstance = activityClass.GetStatic<AndroidJavaObject>("mContext");
-        Debug.Log("Init complete");
+        if (activityClass == null) {
+            activityClass = new AndroidJavaClass(className);
+        }
+        SetUnityObjectName(this.gameObject.name);
     }
 
-    public void SetUnityObjectName(string objectName){
+    public void StartActivityForReason(int reason) {
+        activityClass.CallStatic("Start", new object[] { reason });
+    }
+
+    public void SetUnityObjectName(string objectName) {
         activityClass.SetStatic<string>("UnityObjectName", objectName);
-    }
-
-    public void SetTokenCallbackName(string tokenCallback){
-        activityClass.SetStatic<string>("TokenCallbackName", tokenCallback);
-    }
-
-    public void SetSignInCallbackName(string signInCallback){
-        activityClass.SetStatic<string>("SignInCallbackName", signInCallback);
-    }
-
-    public void SetCirclesLoadedCallbackName(string circlesCallback){
-        activityClass.SetStatic<string>("CirclesCallbackName", circlesCallback);
-    }
-
-    public void SetConnectionSuspendedCallbackName(string callback){
-        activityClass.SetStatic<string>("ConnectionSuspendedCallbackName", callback);
     }
 
     private void Awake() {
@@ -54,38 +36,46 @@ public class GooglePlusWrapper : MonoBehaviour {
     }
 
     private void OnDestroy() {
-        activityClass.Dispose();
-        activityInstance.Dispose();
+        if (activityClass != null) {
+            activityClass.Dispose();
+        }
     }
 
     public void GetToken() {
-        activityInstance.Call("GetToken");
+        StartActivityForReason(GET_TOKEN_REASON);
     }
 
     public void SignIn() {
-        activityInstance.Call("SignIn");
+        StartActivityForReason(SIGN_IN_REASON);
     }
 
     public void SignOut() {
-        activityInstance.Call("SignOut");
+        StartActivityForReason(SIGN_OUT_REASON);
     }
 
     public void LoadCircles() {
-        activityInstance.Call("LoadCircles");
+        StartActivityForReason(LOAD_CIRCLES_REASON);
+    }
+
+    public void RevokeAccess() {
+        StartActivityForReason(REVOKE_ACCESS_REASON);
+    }
+
+    public void InvalidateToken() {
+        StartActivityForReason(INVALIDATE_TOKEN_REASON);
     }
 
     public string GetProfilePictureUrl() {
-        return activityInstance.Call<string>("GetProfilePictureUrl");
+        return activityClass.CallStatic<string>("GetProfilePictureUrl");
     }
 
     public string GetDisplayName() {
-        return activityInstance.Call<string>("GetDisplayName");
+        return activityClass.CallStatic<string>("GetDisplayName");
     }
-    
-	public void OnGoogleTokenReceived(string token) {
-		Token = token;
-		PlayFabLoginCalls.SignOnWithGoogle(token);
-	}
-	
-#endif
+
+    public bool IsSignedIn() {
+        return activityClass.CallStatic<bool>("isConnected");
+    }
+
+    //#endif
 }

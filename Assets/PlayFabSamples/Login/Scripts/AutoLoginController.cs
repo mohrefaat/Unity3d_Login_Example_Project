@@ -146,11 +146,9 @@ public class AutoLoginController : MonoBehaviour {
 			if(PlayFabLoginCalls.CheckForSupportedMobilePlatform())
 			{
 				AutoNewAccount();
-				Debug.Log("Supported!");
 			}
 			else
 			{
-				Debug.Log("Unsupported!");
 				PlayFabLoginCalls.TestDeviceIdHasAccount();
 				yield return new WaitForSeconds(.333f);
 				authController.activeState = AuthenticationController.LoginStates.Manual;

@@ -5,6 +5,15 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="9"
-        android:targetSdkVersion="21" />
+        android:minSdkVersion="9"/>
+    
+    <application android:debuggable="true"
+        android:isGame="true"
+		android:allowBackup="true">        
+        <activity
+            android:name="com.ThugLeaf.GooglePlusForUnity.GooglePlusActivity" 
+			android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+        </activity>
+    </application>
+    
 </manifest>

@@ -51,6 +51,7 @@ public class ContactInfo : ListItemInfo {
         ProfilePicture = texture;
     }
 
+    public const int PROFILE_PICTURE_DIMENSION = 180;
     public const string PROFILE_PICTURE = "PROFILE_PICTURE";
 
     private Texture2D profilePicture = null;

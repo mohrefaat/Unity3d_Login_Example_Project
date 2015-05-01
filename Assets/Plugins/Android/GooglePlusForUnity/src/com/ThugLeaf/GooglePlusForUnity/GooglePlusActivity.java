@@ -32,7 +32,6 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.People.LoadPeopleResult;
 import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.PlusClient.OnAccessRevokedListener;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.Person.Image;
 import com.google.android.gms.plus.model.people.PersonBuffer;
@@ -43,27 +42,37 @@ import com.unity3d.player.UnityPlayer;
  */
 
 
-public class DemoActivity extends Activity 
+public class GooglePlusActivity extends Activity 
 		implements ConnectionCallbacks, 
 					OnConnectionFailedListener,
-					ResultCallback<People.LoadPeopleResult>,
-					OnAccessRevokedListener {
+					ResultCallback<People.LoadPeopleResult> {
 	
-	public static Context mainUnityPlayerActivity = null;
-	public static Context mContext;
-	private static final String TAG = DemoActivity.class.getSimpleName();
+	
+	private static final String TAG = GooglePlusActivity.class.getSimpleName();
 
 	private static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
 	private static final int REQUEST_CODE_PICK_ACCOUNT = 1002;
 	private static final int REQUEST_CODE_AUTH_CONSENT = 1003;
 	private static final int REQUEST_CODE_SIGN_IN = 1004;
 	
+	public static Context mainUnityPlayerActivity = null;
+	
+	public static final int SIGN_IN_REASON = 1;
+	public static final int GET_TOKEN_REASON = 2;
+	public static final int SIGN_OUT_REASON = 3;
+	public static final int LOAD_CIRCLES_REASON = 4;
+	public static final int REVOKE_ACCESS_REASON = 5;
+	public static final int INVALIDATE_TOKEN_REASON = 6;
+	
+	public static int reason = 0;
+	
 	public static String UnityObjectName = "GooglePlusGO";
-	public static String TokenCallbackName = "OnGoogleTokenReceived";
-	public static String CirclesCallbackName = "OnCirclesLoaded";
-	public static String SignInCallbackName = "OnSignInSuccess";
+	public static String OnTokenReceivedCallback = "OnTokenReceived";
+	public static String OnCirclesLoadedCallback = "OnCirclesLoaded";
+	public static String OnSignInSuccessCallback = "OnSignInSuccess";
 	public static String ConnectionSuspendedCallbackName = "OnConnectionSuspended";
-	public static String OnRevokeCallbackName = "OnAccessRevoked";
+	public static String OnAccessRevokedCallback = "OnAccessRevoked";
+	public static String OnTokenInvalidatedCallback = "OnTokenInvalidated";
 	
 	private static String accountName;
  
@@ -77,7 +86,18 @@ public class DemoActivity extends Activity
 	private static String token;
 
     private static GoogleApiClient mGoogleApiClient = null;
-    
+	
+	public static void Start(int reasonToStart){
+		reason = reasonToStart;
+		if (mainUnityPlayerActivity==null) {
+			mainUnityPlayerActivity = UnityPlayer.currentActivity;
+		}
+		Intent intent = new Intent(mainUnityPlayerActivity, GooglePlusActivity.class);
+		//intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+		mainUnityPlayerActivity.startActivity(intent);
+		Log.i(TAG, "StartingActivity "+reason);
+	}
+	    
 	private GoogleApiClient buildGoogleApiClient() {
         // When we build the GoogleApiClient we specify where connected and
         // connection failed callbacks should be returned, which Google APIs our
@@ -90,23 +110,12 @@ public class DemoActivity extends Activity
                 .build();
     }
 	
-	public static void Start(int reasonToStart){
-		reason = reasonToStart;
-		if (mainUnityPlayerActivity==null) {
-			mainUnityPlayerActivity = UnityPlayer.currentActivity;
-		}
-		Intent intent = new Intent(mainUnityPlayerActivity, DemoActivity.class);
-		//intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-		mainUnityPlayerActivity.startActivity(intent);
-		Log.i(TAG, "StartingActivity "+reason);
-	}
-	
 	private void GoBackToUnityActivity(){
 		Log.i(TAG, "GoBackToUnityActivity "+reason);
 		reason = 0;
-		Intent intent = new Intent(mContext, mainUnityPlayerActivity.getClass());
+		Intent intent = new Intent(GooglePlusActivity.this, mainUnityPlayerActivity.getClass());
 		//intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-		mContext.startActivity(intent);
+		startActivity(intent);
 		//finish();
 	}
 
@@ -122,27 +131,12 @@ public class DemoActivity extends Activity
 	}
 	
 	@Override
-	protected void onRestart(){
-		super.onRestart();
-		Log.i(TAG, "onRestart "+reason);
-	}
-	
-	public static final int SIGN_IN_REASON = 1;
-	public static final int GET_TOKEN_REASON = 2;
-	public static final int SIGN_OUT_REASON = 3;
-	public static final int LOAD_CIRCLES_REASON = 4;
-	public static final int REVOKE_ACCESS_REASON = 5;
-	
-	public static int reason = 0;
-	
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (mGoogleApiClient==null) {
 			mGoogleApiClient = buildGoogleApiClient();
 		}
 		Log.i(TAG, "onCreate "+reason);
-		mContext = this;
 	}
 
 	@Override
@@ -165,6 +159,8 @@ public class DemoActivity extends Activity
 			case REVOKE_ACCESS_REASON:
 				RevokeAccess();
 				break;
+			case INVALIDATE_TOKEN_REASON:
+				InvalidateToken();
 			default:
 				GoBackToUnityActivity();
 				break;
@@ -217,7 +213,7 @@ public class DemoActivity extends Activity
 					Log.i(TAG, "REQUEST_CODE_RECOVER_PLAY_SERVICES : " + resultCode);
 				}
 				return;
-			case (REQUEST_CODE_PICK_ACCOUNT):
+			case REQUEST_CODE_PICK_ACCOUNT:
 				if (resultCode == RESULT_OK) {
 					accountName = data
 							.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
@@ -332,7 +328,7 @@ public class DemoActivity extends Activity
 				token = code;
 				// Log.i(TAG, "Access token retrieved:" + code);
 				UnityPlayer.UnitySendMessage(UnityObjectName,
-						TokenCallbackName, code);
+						OnTokenReceivedCallback, code);
 				GoBackToUnityActivity();
 			}
 
@@ -345,7 +341,7 @@ public class DemoActivity extends Activity
 			@Override
 			protected Void doInBackground(Void...params) {
 				try {
-					GoogleAuthUtil.clearToken(mContext, token);
+					GoogleAuthUtil.clearToken(GooglePlusActivity.this, token);
 				} catch (GoogleAuthException | IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -356,6 +352,10 @@ public class DemoActivity extends Activity
 			@Override
 			protected void onPostExecute(Void x) {
 				token = null;
+				UnityPlayer.UnitySendMessage(UnityObjectName, OnTokenInvalidatedCallback, "");
+				if (reason == INVALIDATE_TOKEN_REASON){
+					GoBackToUnityActivity();
+				}
 			}
 
 		};
@@ -383,13 +383,11 @@ public class DemoActivity extends Activity
 			GoBackToUnityActivity();
 		}else {*/
 			Log.i(TAG, "GooglePlusSignIn");
-	 		reason = SIGN_IN_REASON;
 	 		startResolution();
 		//}
     }
 	
 	public void SignOut(){
-		reason = SIGN_OUT_REASON;
 		accountName = null;
 		if (isConnected()){
 			// We clear the default account on sign out so that Google Play
@@ -415,20 +413,16 @@ public class DemoActivity extends Activity
                         	// mGoogleApiClient is now disconnected and access has been revoked.
                     		// Trigger app logic to comply with the developer policies
                             Log.e(TAG, "User access revoked!");
-                            UnityPlayer.UnitySendMessage(UnityObjectName, OnRevokeCallbackName, "");
+                            UnityPlayer.UnitySendMessage(UnityObjectName, OnAccessRevokedCallback, "");
                             mGoogleApiClient = buildGoogleApiClient();
                             mGoogleApiClient.connect();
                         }
                     });
+        }else {
+        	GoBackToUnityActivity();
         }
 	}
 		
-	@Override
-	public void onAccessRevoked(ConnectionResult result) {
-		// TODO Auto-generated method stub
-		Log.i(TAG, "AccessRevoked ");
-	}
-	
 	private void showAccountPicker() {
 		Intent pickAccountIntent = AccountPicker.newChooseAccountIntent(null,
 				null, new String[] { GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE },
@@ -519,7 +513,7 @@ public class DemoActivity extends Activity
         } finally {
             personBuffer.release();
         }
-        UnityPlayer.UnitySendMessage(UnityObjectName, CirclesCallbackName, circles);
+        UnityPlayer.UnitySendMessage(UnityObjectName, OnCirclesLoadedCallback, circles);
       } else {
         Log.e(TAG, "Error requesting visible circles: " + peopleData.getStatus());
       }
@@ -594,7 +588,7 @@ public class DemoActivity extends Activity
 		Log.i(TAG, "onConnected");
 		accountName = Plus.AccountApi.getAccountName(mGoogleApiClient);
 		UnityPlayer.UnitySendMessage(UnityObjectName,
-				SignInCallbackName, Plus.PeopleApi.getCurrentPerson(mGoogleApiClient).getId());
+				OnSignInSuccessCallback, Plus.PeopleApi.getCurrentPerson(mGoogleApiClient).getId());
 		GoBackToUnityActivity();
 	}
 	

@@ -21,6 +21,7 @@ public class PlayFabLoginCalls  {
 	public bool hasTitleId = false;
 	public static string android_id = string.Empty; // device ID to use with PlayFab login
 	public static string ios_id = string.Empty; // device ID to use with PlayFab login
+	public static string publisher_id = string.Empty;
 	
 	// used to store our google token
 	private static  string token;
@@ -93,23 +94,34 @@ public class PlayFabLoginCalls  {
 	/// <summary>
 	/// Google plus wrapper class was contributed by Hamza Lazâar Twitter: @RealJohnTube
 	/// For the purposes of PlayFab authentication, we are only using GetToken(); however, there are many more integrated Google+ features available. 
-	/// This class calls a native java plugin which then returns via callback [SetTokenCallbackName()] to a scene.
+	/// This class calls a native java plugin which then returns via callback [OnTokenReceivedCallback] to a scene.
 	/// </summary>
 	/// <param name="callBackObject">This is the name of the gameObject to call back to with the token. (Plugin default = "GooglePlusGO")</param>
 	/// <param name="callBackMethod">This is the name of the method to call. (Plugin default = "OnGoogleTokenReceived")</param>
 	public static void StartGooglePlusLogin(string callBackObject="Panel_Authentication", string callBackMethod="OnGoogleTokenReceived")
 	{
-		string className = "com.ThugLeaf.GooglePlusForUnity.DemoActivity";
+		#if UNITY_ANDROID
+		// internal settings for using GooglePlusActivity
+		//int SIGN_IN_REASON = 1;
+		int GET_TOKEN_REASON = 2;
+		//int SIGN_OUT_REASON = 3;
+		//int LOAD_CIRCLES_REASON = 4;
+		//int REVOKE_ACCESS_REASON = 5;
+		//int INVALIDATE_TOKEN_REASON = 6;
+		
+		string className = "com.ThugLeaf.GooglePlusForUnity.GooglePlusActivity"; //com.ThugLeaf.GooglePlusForUnity.DemoActivity
 		AndroidJNI.AttachCurrentThread();
 		using( AndroidJavaClass activityClass = new AndroidJavaClass(className))
 		{
-			using(AndroidJavaObject activityInstance = activityClass.GetStatic<AndroidJavaObject>("mContext"))
-			{
-				activityClass.SetStatic<string>("UnityObjectName", callBackObject);
-				activityClass.SetStatic<string>("TokenCallbackName", callBackMethod);
-				activityInstance.Call("GetToken");
-			}
+			//using(AndroidJavaObject activityInstance = activityClass.GetStatic<AndroidJavaObject>("mContext"))
+			//{
+				activityClass.SetStatic<string>("UnityObjectName", callBackObject); //UnityObjectName
+				activityClass.SetStatic<string>("OnTokenReceivedCallback", callBackMethod); //TokenCallbackName
+				//activityInstance.Call("GetToken");
+				activityClass.CallStatic("Start", new object[] { GET_TOKEN_REASON });
+			//}
 		}
+		#endif
 	}
 	
 	
@@ -152,6 +164,45 @@ public class PlayFabLoginCalls  {
 			return false;
 		}
 		return true;
+	}
+	
+	/// <summary>
+	/// Determines if the current platform can use a specific service path.
+	/// </summary>
+	/// <returns><c>true</c> if service can be used on the current platform; otherwise, <c>false</c>.</returns>
+	/// <param name="path">Path.</param>
+	public static bool CanUseService(PlayFabLoginCalls.LoginPathways path)
+	{
+		switch(path)
+		{
+			case LoginPathways.deviceId:
+				return CheckForSupportedMobilePlatform();
+
+			case LoginPathways.facebook:
+				return CheckForSupportedMobilePlatform();
+
+			case LoginPathways.steam:
+				if(Application.platform == RuntimePlatform.LinuxPlayer || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer)
+				{
+					// need additional checks here once the steamworks API is integrated
+					return true;
+				}
+			break;
+			
+			case LoginPathways.gameCenter:
+				if(Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.IPhonePlayer)
+				{
+					return true;
+				}
+			break;
+			
+			case LoginPathways.pf_email:
+				return true;
+			
+			case LoginPathways.pf_username:
+				return true;
+		}
+		return false;
 	}
 	
 	/// <summary>
@@ -200,6 +251,12 @@ public class PlayFabLoginCalls  {
 			request.AccessToken = token;
 			request.TitleId = PlayFabSettings.TitleId;
 			request.CreateAccount = false;
+			
+			if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+			{
+				request.PublisherId = PlayFabLoginCalls.publisher_id;
+			}
+			
 			PlayFabClientAPI.LoginWithFacebook(request, OnLoginResult, OnLoginError);
 		}
 		
@@ -214,7 +271,12 @@ public class PlayFabLoginCalls  {
 //			request.PlayerId = token;
 //			request.TitleId = PlayFabSettings.TitleId;
 //			request.CreateAccount = false;
-//			
+
+//			if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+//			{
+//				request.PublisherId = PlayFabLoginCalls.publisher_id;
+//			}
+
 //			PlayFabClientAPI.LoginWithGameCenter(request, OnLoginResult, OnLoginError);
 		}
 		
@@ -260,6 +322,11 @@ public class PlayFabLoginCalls  {
 				request.Email = email;
 				request.Password = pass1;
 				
+				if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+				{
+					request.PublisherId = PlayFabLoginCalls.publisher_id;
+				}
+				
 				PlayFabClientAPI.RegisterPlayFabUser(request, OnRegisterResult, OnPlayFabCallbackError);
 			}
 		}
@@ -278,6 +345,11 @@ public class PlayFabLoginCalls  {
 				request.Username = user;
 				request.Password = password;
 				request.TitleId = PlayFabSettings.TitleId;
+			
+				if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+				{
+					request.PublisherId = PlayFabLoginCalls.publisher_id;
+				}
 				
 				PlayFabClientAPI.LoginWithPlayFab(request, OnLoginResult, OnLoginError);
 			}
@@ -304,6 +376,11 @@ public class PlayFabLoginCalls  {
 				request.Email = user;
 				request.Password = password;
 				request.TitleId = PlayFabSettings.TitleId;
+		
+				if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+				{
+					request.PublisherId = PlayFabLoginCalls.publisher_id;
+				}
 				
 				PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginResult, OnLoginError);
 				
@@ -333,6 +410,12 @@ public class PlayFabLoginCalls  {
 					request.AndroidDeviceId = android_id;
 					request.TitleId = PlayFabSettings.TitleId;
 					request.CreateAccount = createAcount;
+					
+					if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+					{
+						request.PublisherId = PlayFabLoginCalls.publisher_id;
+					}
+					
 					PlayFabClientAPI.LoginWithAndroidDeviceID(request, OnLoginResult, OnLoginError);
 				}
 				else if (!string.IsNullOrEmpty(ios_id))
@@ -342,6 +425,12 @@ public class PlayFabLoginCalls  {
 					request.DeviceId = ios_id;
 					request.TitleId = PlayFabSettings.TitleId;
 					request.CreateAccount = createAcount;
+					
+					if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+					{
+						request.PublisherId = PlayFabLoginCalls.publisher_id;
+					}
+				
 					PlayFabClientAPI.LoginWithIOSDeviceID(request, OnLoginResult, OnLoginError);
 				}
 			}
@@ -357,6 +446,12 @@ public class PlayFabLoginCalls  {
 			LoginWithGoogleAccountRequest request = new LoginWithGoogleAccountRequest();
 			request.AccessToken = token;
 			request.CreateAccount = true;
+			
+			if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+			{
+				request.PublisherId = PlayFabLoginCalls.publisher_id;
+			}
+			
 			PlayFabClientAPI.LoginWithGoogleAccount(request, OnLoginResult, OnLoginError);
 			
 		}
@@ -375,6 +470,7 @@ public class PlayFabLoginCalls  {
 				RequestSpinner();
 				UpdateUserTitleDisplayNameRequest request = new UpdateUserTitleDisplayNameRequest();
 				request.DisplayName = displayName;
+				
 				PlayFabClientAPI.UpdateUserTitleDisplayName(request, OnUpdateDisplayNameSuccess, OnPlayFabCallbackError);
 			}
 			else
@@ -394,10 +490,17 @@ public class PlayFabLoginCalls  {
 		/// <param name="email">Email - email to use (must be unique)</param>
 		public static void AddUserNameAndPassword(string user, string pass, string email)
 		{
+			PlayFabLoginCalls.RequestSpinner();
 			AddUsernamePasswordRequest request = new AddUsernamePasswordRequest();
 			request.Email = email;
 			request.Password = pass;
 			request.Username = user;
+			
+			if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+			{
+				request.PublisherId = PlayFabLoginCalls.publisher_id;
+			}
+			
 			PlayFabClientAPI.AddUsernamePassword(request, OnAddUserNameAndPasswordSuccess, OnPlayFabCallbackError);
 		}
 		
@@ -420,6 +523,12 @@ public class PlayFabLoginCalls  {
 			SendAccountRecoveryEmailRequest request = new SendAccountRecoveryEmailRequest();
 			request.Email = email;
 			request.TitleId = PlayFabSettings.TitleId;
+			
+			if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+			{
+				request.PublisherId = PlayFabLoginCalls.publisher_id;
+			}
+			
 			PlayFabClientAPI.SendAccountRecoveryEmail(request, OnSendAccountRecoveryEmailSuccess, OnPlayFabCallbackError);
 		}
 		
@@ -436,6 +545,12 @@ public class PlayFabLoginCalls  {
 					Debug.Log("Linking Android");
 					LinkAndroidDeviceIDRequest request = new LinkAndroidDeviceIDRequest();
 					request.AndroidDeviceId = android_id;
+					
+					if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+					{
+						request.PublisherId = PlayFabLoginCalls.publisher_id;
+					}
+					
 					PlayFabClientAPI.LinkAndroidDeviceID(request, OnLinkAndroidDeviceIdSuccess, OnPlayFabCallbackError);
 				}
 				else if (!string.IsNullOrEmpty(ios_id))
@@ -443,6 +558,12 @@ public class PlayFabLoginCalls  {
 					Debug.Log("Linking iOS");
 					LinkIOSDeviceIDRequest request = new LinkIOSDeviceIDRequest();
 					request.DeviceId = ios_id;
+					
+					if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+					{
+						request.PublisherId = PlayFabLoginCalls.publisher_id;
+					}
+					
 					PlayFabClientAPI.LinkIOSDeviceID(request, OnLinkIosDeviceIdSuccess, OnPlayFabCallbackError);
 				}
 			}
@@ -486,6 +607,12 @@ public class PlayFabLoginCalls  {
 					request.AndroidDeviceId = android_id;
 					request.TitleId = PlayFabSettings.TitleId;
 					request.CreateAccount = false;
+					
+					if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+					{
+						request.PublisherId = PlayFabLoginCalls.publisher_id;
+					}
+					
 					PlayFabClientAPI.LoginWithAndroidDeviceID(request, OnLoginResult, OnTestDeviceIdHasAccountError);
 				}
 				else if (!string.IsNullOrEmpty(ios_id))
@@ -495,6 +622,12 @@ public class PlayFabLoginCalls  {
 					request.DeviceId = ios_id;
 					request.TitleId = PlayFabSettings.TitleId;
 					request.CreateAccount = false;
+					
+					if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
+					{
+						request.PublisherId = PlayFabLoginCalls.publisher_id;
+					}
+					
 					PlayFabClientAPI.LoginWithIOSDeviceID(request, OnLoginResult, OnTestDeviceIdHasAccountError);
 				}
 			}
@@ -659,7 +792,7 @@ public class PlayFabLoginCalls  {
 			
 			if(OnLoginSuccess != null)
 			{
-				OnLoginSuccess(string.Format("{0}", result.PlayFabId ));
+				OnLoginSuccess(string.Format("{0}", result.SessionTicket ));
 			}
 		}
 		

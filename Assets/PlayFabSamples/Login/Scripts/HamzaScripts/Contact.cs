@@ -14,11 +14,13 @@ public class Contact : ListItem {
         ContactInfo info = (ContactInfo)ItemInfo;
         DisplayNameText.text = info.DisplayName;
         if (info.ProfilePicture == null) {
-            ProfilePictureImage.sprite = new Sprite();
+            ProfilePictureImage.sprite = new Sprite(); // set default avatar instead
             DownloadManager.Instance.DownloadTextureAsync(info.ProfilePictureUrl, info.OnProfilePictureDownloaded);
         }
         else {
-            ProfilePictureImage.SetTexture2D(info.ProfilePicture, 180f, 180f);
+            ProfilePictureImage.SetTexture2D(info.ProfilePicture,
+                ContactInfo.PROFILE_PICTURE_DIMENSION,
+                ContactInfo.PROFILE_PICTURE_DIMENSION);
         }
     }
 
@@ -26,7 +28,9 @@ public class Contact : ListItem {
         ContactInfo info = (ContactInfo)ItemInfo;
         switch (args.PropertyName) {
             case ContactInfo.PROFILE_PICTURE:
-                ProfilePictureImage.SetTexture2D(info.ProfilePicture, 180f, 180f);
+                ProfilePictureImage.SetTexture2D(info.ProfilePicture,
+                    ContactInfo.PROFILE_PICTURE_DIMENSION,
+                    ContactInfo.PROFILE_PICTURE_DIMENSION);
                 break;
         }
     }

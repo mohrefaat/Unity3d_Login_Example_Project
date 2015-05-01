@@ -4,7 +4,18 @@ using UnityEngine;
 
 public class PoolManager : Singleton<PoolManager> {
     private Dictionary<int, Pool> pools = new Dictionary<int, Pool>();
-    public Transform poolContainer;
+
+    [SerializeField]
+    private Transform poolContainer;
+
+    private void Start() {
+        if (poolContainer != null) {
+            poolContainer.gameObject.SetActive(false);
+        }
+        else {
+            // error
+        }
+    }
 
     public void InitPool(GameObject original, int initialSize, int maxSize) {
         CheckPoolExistence(original);
