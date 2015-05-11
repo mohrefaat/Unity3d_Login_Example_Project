@@ -18,6 +18,11 @@ This repo contains the raw Unity3d (v4.6.3) project.
     * Example: When linked, a player can log in using Facebook, Google+, email, or GameCenter and be assured that his or her player data persists across the various pathways. 
     * Documentation on linking accounts can be found [here](https://api.playfab.com/Documentation/Client/method/LinkFacebookAccount).
 
+To connect to the PlayFab service, your machine must be running TLS v1.1 or better.
+* For Windows, this means Windows 7 and above
+* [Official Microsoft Documentation](https://msdn.microsoft.com/en-us/library/windows/desktop/aa380516%28v=vs.85%29.aspx)
+* [Support for SSL/TLS protocols on Windows](http://blogs.msdn.com/b/kaushal/archive/2011/10/02/support-for-ssl-tls-protocols-on-windows.aspx)
+
 3. Source Code & Key Repository Components:
 ----
 ### PlayFab Components 
