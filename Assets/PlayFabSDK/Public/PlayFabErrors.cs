@@ -140,7 +140,16 @@ namespace PlayFab
 		InvalidCharacterStatistics = 1138,
 		PhotonNotEnabledForTitle = 1139,
 		PhotonApplicationNotFound = 1140,
-		PhotonApplicationNotAssociatedWithTitle = 1141
+		PhotonApplicationNotAssociatedWithTitle = 1141,
+		InvalidEmailOrPassword = 1142,
+		FacebookAPIError = 1143,
+		InvalidContentType = 1144,
+		KeyLengthExceeded = 1145,
+		DataLengthExceeded = 1146,
+		TooManyKeys = 1147,
+		FreeTierCannotHaveVirtualCurrency = 1148,
+		MissingAmazonSharedKey = 1149,
+		AmazonValidationError = 1150
 	}
 	
 	public class PlayFabError

@@ -1,4 +1,4 @@
-PlayFab Login Example README (v1.9)
+PlayFab Login Example README (v2.0)
 ========
 1. Overview:
 ----
@@ -6,7 +6,7 @@ This repo exits to inform our developers and customers about the many PlayFab-su
 
 2. Prerequisites:
 ----
-This repo contains the raw Unity3d (v4.6.3) project. 
+This repo contains the raw Unity3d (v5.1) project. 
 
 1. This demo is intended to illustrate generic best practices around authenticating players with PlayFab's supported login flows. 
 2. While not exclusively relevant for mobile, this demo makes heavy use of device IDs (which do not have an equivalent on PC / Mac / Web)

@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using System;
 using System.Collections;
-using PlayFab.Serialization.JsonFx;
+using Newtonsoft.Json;
 using PlayFab.ClientModels;
 
 /// <summary>
@@ -81,7 +81,7 @@ public class AutoLoginController : MonoBehaviour {
 				case PlayFabLoginCalls.LoginPathways.pf_username:
 					if(PlayerPrefs.HasKey("accountInfo"))
 					{
-						this.accountInfo = JsonReader.Deserialize<UserAccountInfo>(PlayerPrefs.GetString("accountInfo"));
+					this.accountInfo =  JsonConvert.DeserializeObject<UserAccountInfo>(PlayerPrefs.GetString("accountInfo"));
 						this.createNewAccount = false;
 						PrompForPassword();
 						this.details.text = string.Format("PlayFab Username: {0} found...", this.accountInfo.Username);
@@ -93,7 +93,7 @@ public class AutoLoginController : MonoBehaviour {
 				case PlayFabLoginCalls.LoginPathways.pf_email:
 					if(PlayerPrefs.HasKey("accountInfo"))
 					{
-						this.accountInfo = JsonReader.Deserialize<UserAccountInfo>(PlayerPrefs.GetString("accountInfo"));
+						this.accountInfo =  JsonConvert.DeserializeObject<UserAccountInfo>(PlayerPrefs.GetString("accountInfo"));
 						this.createNewAccount = false;
 						PrompForPassword();
 						this.details.text = string.Format("Email: {0} found...", this.accountInfo.PrivateInfo.Email);

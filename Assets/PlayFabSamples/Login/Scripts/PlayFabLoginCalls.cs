@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using PlayFab;
 using PlayFab.ClientModels;
 using PlayFab.Internal;
-using PlayFab.Serialization.JsonFx;
+using Newtonsoft.Json;
 
 /// <summary>
 ///  Contains static functions for all the PlayFab API and helper calls. If you are looking for PlayFab calls, they should all be in this class.

@@ -55,7 +55,7 @@ namespace PlayFab.Internal
 			
 			if(!String.IsNullOrEmpty(www.error))
 			{
-				//Debug.LogError(www.error);
+				Debug.LogError(www.error);
 				callback(null, www.error);
 			}
 			else

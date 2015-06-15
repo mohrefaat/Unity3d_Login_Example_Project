@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using System;
 using System.Collections;
-using PlayFab.Serialization.JsonFx;
+using Newtonsoft.Json;
 
 /// <summary>
 /// Authentication controller, The main source of logic for this demo. 
@@ -150,7 +150,7 @@ public class AuthenticationController : MonoBehaviour {
 	void SaveUserAccountInfo()
 	{
 		Debug.Log ("Saving Account Info...");
-		string serialized = JsonWriter.Serialize(PlayFabLoginCalls.LoggedInUserInfo);
+		string serialized =  JsonConvert.SerializeObject(PlayFabLoginCalls.LoggedInUserInfo);
 		PlayerPrefs.SetString("accountInfo", serialized);
 	}
 	
