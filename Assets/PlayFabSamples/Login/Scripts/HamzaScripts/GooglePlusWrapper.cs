@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class GooglePlusWrapper : MonoBehaviour {
 
-    //#if !UNITY_EDITOR && UNITY_ANDROID
+    #if !UNITY_EDITOR && UNITY_ANDROID
     private const string className = "com.ThugLeaf.GooglePlusForUnity.GooglePlusActivity";
 
     public static int SIGN_IN_REASON = 1;
@@ -77,5 +77,5 @@ public class GooglePlusWrapper : MonoBehaviour {
         return activityClass.CallStatic<bool>("isConnected");
     }
 
-    //#endif
+    #endif
 }

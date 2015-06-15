@@ -222,7 +222,7 @@ public class PlayFabLoginCalls  {
 			#endif
 			
 			#if UNITY_IPHONE
-			ios_id = iPhone.vendorIdentifier;
+			ios_id = UnityEngine.iOS.Device.vendorIdentifier;
 			#endif
 			return true;
 		}
