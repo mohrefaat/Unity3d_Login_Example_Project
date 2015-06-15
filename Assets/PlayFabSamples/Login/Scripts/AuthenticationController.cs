@@ -10,7 +10,6 @@ using PlayFab.Serialization.JsonFx;
 public class AuthenticationController : MonoBehaviour {
 	// PLAYFAB ID -- ENTER YOUR OWN TITLE ID HERE OR USE OUR'S FOR TESTING (ID=9D68)
 	public string PlayFabTitleId = string.Empty;
-	public string publisherId;
 	
 	// references to other scene components
 	public BottomMenuController bottomMenu;
@@ -54,17 +53,7 @@ public class AuthenticationController : MonoBehaviour {
 		else if(string.IsNullOrEmpty(PlayFab.PlayFabSettings.TitleId))
 		{
 			Debug.Log ("PlayFab Title Id Required. Please enter your Id on the Authentication Controller");
-		}
-		
-		if(!string.IsNullOrEmpty(this.publisherId))
-		{
-			PlayFabLoginCalls.publisher_id = this.publisherId;
-		}
-		else
-		{
-			Debug.Log ("PlayFab Publiser ID not provided, using global account space");
-		}
-		
+		}		
 		
 	}
 	

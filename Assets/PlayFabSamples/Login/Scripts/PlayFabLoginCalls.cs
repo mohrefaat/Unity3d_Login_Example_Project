@@ -21,7 +21,6 @@ public class PlayFabLoginCalls  {
 	public bool hasTitleId = false;
 	public static string android_id = string.Empty; // device ID to use with PlayFab login
 	public static string ios_id = string.Empty; // device ID to use with PlayFab login
-	public static string publisher_id = string.Empty;
 	
 	// used to store our google token
 	private static  string token;
@@ -252,11 +251,6 @@ public class PlayFabLoginCalls  {
 			request.TitleId = PlayFabSettings.TitleId;
 			request.CreateAccount = false;
 			
-			if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-			{
-				request.PublisherId = PlayFabLoginCalls.publisher_id;
-			}
-			
 			PlayFabClientAPI.LoginWithFacebook(request, OnLoginResult, OnLoginError);
 		}
 		
@@ -271,11 +265,6 @@ public class PlayFabLoginCalls  {
 //			request.PlayerId = token;
 //			request.TitleId = PlayFabSettings.TitleId;
 //			request.CreateAccount = false;
-
-//			if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-//			{
-//				request.PublisherId = PlayFabLoginCalls.publisher_id;
-//			}
 
 //			PlayFabClientAPI.LoginWithGameCenter(request, OnLoginResult, OnLoginError);
 		}
@@ -321,12 +310,6 @@ public class PlayFabLoginCalls  {
 				request.Username = user;
 				request.Email = email;
 				request.Password = pass1;
-				
-				if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-				{
-					request.PublisherId = PlayFabLoginCalls.publisher_id;
-				}
-				
 				PlayFabClientAPI.RegisterPlayFabUser(request, OnRegisterResult, OnPlayFabCallbackError);
 			}
 		}
@@ -345,12 +328,6 @@ public class PlayFabLoginCalls  {
 				request.Username = user;
 				request.Password = password;
 				request.TitleId = PlayFabSettings.TitleId;
-			
-				if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-				{
-					request.PublisherId = PlayFabLoginCalls.publisher_id;
-				}
-				
 				PlayFabClientAPI.LoginWithPlayFab(request, OnLoginResult, OnLoginError);
 			}
 			else
@@ -376,11 +353,6 @@ public class PlayFabLoginCalls  {
 				request.Email = user;
 				request.Password = password;
 				request.TitleId = PlayFabSettings.TitleId;
-		
-				if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-				{
-					request.PublisherId = PlayFabLoginCalls.publisher_id;
-				}
 				
 				PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginResult, OnLoginError);
 				
@@ -410,12 +382,7 @@ public class PlayFabLoginCalls  {
 					request.AndroidDeviceId = android_id;
 					request.TitleId = PlayFabSettings.TitleId;
 					request.CreateAccount = createAcount;
-					
-					if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-					{
-						request.PublisherId = PlayFabLoginCalls.publisher_id;
-					}
-					
+
 					PlayFabClientAPI.LoginWithAndroidDeviceID(request, OnLoginResult, OnLoginError);
 				}
 				else if (!string.IsNullOrEmpty(ios_id))
@@ -425,12 +392,7 @@ public class PlayFabLoginCalls  {
 					request.DeviceId = ios_id;
 					request.TitleId = PlayFabSettings.TitleId;
 					request.CreateAccount = createAcount;
-					
-					if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-					{
-						request.PublisherId = PlayFabLoginCalls.publisher_id;
-					}
-				
+	
 					PlayFabClientAPI.LoginWithIOSDeviceID(request, OnLoginResult, OnLoginError);
 				}
 			}
@@ -446,11 +408,6 @@ public class PlayFabLoginCalls  {
 			LoginWithGoogleAccountRequest request = new LoginWithGoogleAccountRequest();
 			request.AccessToken = token;
 			request.CreateAccount = true;
-			
-			if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-			{
-				request.PublisherId = PlayFabLoginCalls.publisher_id;
-			}
 			
 			PlayFabClientAPI.LoginWithGoogleAccount(request, OnLoginResult, OnLoginError);
 			
@@ -496,11 +453,6 @@ public class PlayFabLoginCalls  {
 			request.Password = pass;
 			request.Username = user;
 			
-			if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-			{
-				request.PublisherId = PlayFabLoginCalls.publisher_id;
-			}
-			
 			PlayFabClientAPI.AddUsernamePassword(request, OnAddUserNameAndPasswordSuccess, OnPlayFabCallbackError);
 		}
 		
@@ -524,11 +476,6 @@ public class PlayFabLoginCalls  {
 			request.Email = email;
 			request.TitleId = PlayFabSettings.TitleId;
 			
-			if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-			{
-				request.PublisherId = PlayFabLoginCalls.publisher_id;
-			}
-			
 			PlayFabClientAPI.SendAccountRecoveryEmail(request, OnSendAccountRecoveryEmailSuccess, OnPlayFabCallbackError);
 		}
 		
@@ -546,11 +493,6 @@ public class PlayFabLoginCalls  {
 					LinkAndroidDeviceIDRequest request = new LinkAndroidDeviceIDRequest();
 					request.AndroidDeviceId = android_id;
 					
-					if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-					{
-						request.PublisherId = PlayFabLoginCalls.publisher_id;
-					}
-					
 					PlayFabClientAPI.LinkAndroidDeviceID(request, OnLinkAndroidDeviceIdSuccess, OnPlayFabCallbackError);
 				}
 				else if (!string.IsNullOrEmpty(ios_id))
@@ -558,11 +500,6 @@ public class PlayFabLoginCalls  {
 					Debug.Log("Linking iOS");
 					LinkIOSDeviceIDRequest request = new LinkIOSDeviceIDRequest();
 					request.DeviceId = ios_id;
-					
-					if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-					{
-						request.PublisherId = PlayFabLoginCalls.publisher_id;
-					}
 					
 					PlayFabClientAPI.LinkIOSDeviceID(request, OnLinkIosDeviceIdSuccess, OnPlayFabCallbackError);
 				}
@@ -608,11 +545,6 @@ public class PlayFabLoginCalls  {
 					request.TitleId = PlayFabSettings.TitleId;
 					request.CreateAccount = false;
 					
-					if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-					{
-						request.PublisherId = PlayFabLoginCalls.publisher_id;
-					}
-					
 					PlayFabClientAPI.LoginWithAndroidDeviceID(request, OnLoginResult, OnTestDeviceIdHasAccountError);
 				}
 				else if (!string.IsNullOrEmpty(ios_id))
@@ -622,11 +554,6 @@ public class PlayFabLoginCalls  {
 					request.DeviceId = ios_id;
 					request.TitleId = PlayFabSettings.TitleId;
 					request.CreateAccount = false;
-					
-					if(!string.IsNullOrEmpty(PlayFabLoginCalls.publisher_id))
-					{
-						request.PublisherId = PlayFabLoginCalls.publisher_id;
-					}
 					
 					PlayFabClientAPI.LoginWithIOSDeviceID(request, OnLoginResult, OnTestDeviceIdHasAccountError);
 				}
