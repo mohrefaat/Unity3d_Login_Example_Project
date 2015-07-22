@@ -58,8 +58,6 @@ public class PlayFabLoginCalls  {
 	public delegate void StartSpinner();
 	public static event StartSpinner StartSpinnerRequest;
 	
-	// regex pattern for validating email syntax
-	private const string emailPattern = @"^([0-9a-zA-Z]([\+\-_\.][0-9a-zA-Z]+)*)+@(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]*\.)+[a-zA-Z0-9]{2,17})$";
 #endregion
 
 #region Plugin Access & Helper Functions
@@ -121,16 +119,6 @@ public class PlayFabLoginCalls  {
 			//}
 		}
 		#endif
-	}
-	
-	
-	/// <summary>
-	/// Validates the email.
-	/// </summary>
-	/// <returns><c>true</c>, if email was validated, <c>false</c> otherwise.</returns>
-	/// <param name="em">Email address</param>
-	public static bool ValidateEmail(string em){
-		return Regex.IsMatch(em, PlayFabLoginCalls.emailPattern);
 	}
 	
 	/// <summary>
@@ -284,22 +272,12 @@ public class PlayFabLoginCalls  {
 			}
 			
 			bool passwordCheck = ValidatePassword(pass1, pass2);
-			bool emailCheck = ValidateEmail(email);
 			
 			if(!passwordCheck)
 			{
 				if(OnPlayFabError != null)
 				{
 					OnPlayFabError("Passwords must match and be longer than 5 characters.", PlayFabAPIMethods.RegisterPlayFabUser);
-				}
-				return;
-				
-			}
-			else if(!emailCheck)
-			{
-				if(OnPlayFabError != null)
-				{
-					OnPlayFabError("Invalid Email format.", PlayFabAPIMethods.RegisterPlayFabUser);
 				}
 				return;
 			}
@@ -346,7 +324,7 @@ public class PlayFabLoginCalls  {
 		/// <param name="password">Password.</param>
 		public static void LoginWithEmail(string user, string password)
 		{		
-			if(user.Length>0 && password.Length>0 && ValidateEmail(user))
+			if(user.Length>0 && password.Length>0)
 			{
 				LoginMethodUsed = LoginPathways.pf_email;
 				LoginWithEmailAddressRequest request = new LoginWithEmailAddressRequest();

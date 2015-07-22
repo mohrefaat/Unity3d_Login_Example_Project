@@ -35,10 +35,7 @@ public class Fields_PlayFab : MonoBehaviour {
 		PlayFabLoginCalls.RequestSpinner();
 		if(User.text.Contains("@"))
 		{
-			if(PlayFabLoginCalls.ValidateEmail(User.text))
-			{
-				PlayFabLoginCalls.LoginWithEmail(User.text, Password.text);
-			}
+			PlayFabLoginCalls.LoginWithEmail(User.text, Password.text);
 		}
 		else
 		{
